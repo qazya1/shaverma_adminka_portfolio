@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shaverma Admin — Login</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="auth-body">
+  <div class="card">
+    <h1>Shaverma Admin</h1>
+    <p class="subtitle">Вход в панель управления</p>
+    <p id="local-demo-note" class="local-demo-note hidden" role="note"></p>
+
+    <section id="step-1" class="step active">
+      <div id="password-error" class="error"></div>
+      <form id="password-form">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" autocomplete="username" required />
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required />
+
+        <button type="submit">Войти</button>
+      </form>
+    </section>
+
+    <section id="step-2" class="step">
+      <div id="otp-error" class="error"></div>
+      <form id="otp-form">
+        <label for="otp-code">Код из Telegram</label>
+        <input type="text" id="otp-code" name="otp-code" inputmode="numeric" autocomplete="one-time-code" required />
+        <p id="otp-hint" class="hint"></p>
+
+        <button type="submit">Подтвердить</button>
+        <button type="button" id="back-button" class="secondary">Назад</button>
+      </form>
+    </section>
+  </div>
+
+  <script src="js/local-demo.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>

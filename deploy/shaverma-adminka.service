@@ -1,0 +1,117 @@
+# Example systemd unit for the adminka backend itself.
+#
+# The OS user it runs as -- and therefore the user the sudoers rule in
+# README.md (## Deployment: system user and sudoers) must grant systemctl
+# start/stop to -- is set right here via User=/Group=, not in .env: the
+# application never reads its own OS username, sudo authorizes based on
+# the real UID of the running process, not on any application config.
+#
+# Rename "shaverma-admin" to whatever you like; just keep this file and
+# the sudoers rule in sync.
+#
+# Install:
+#   sudo useradd --system --home /opt/shaverma_adminka --shell /usr/sbin/nologin shaverma-admin
+#   sudo mkdir -p /var/lib/shaverma_adminka/staging
+#   sudo chown shaverma-admin:shaverma-admin /var/lib/shaverma_adminka/staging
+#   # (INSTANCES_ROOT_DIR itself is created root-owned -- see the README's
+#   # sudoers section, not here; this user only ever reaches it via sudo.)
+#   sudo cp deploy/shaverma-adminka.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now shaverma-adminka
+
+[Unit]
+Description=Shaverma Adminka backend
+After=network.target mysql.service
+
+[Service]
+Type=simple
+User=shaverma-admin
+Group=shaverma-admin
+WorkingDirectory=/opt/shaverma_adminka/backend
+EnvironmentFile=/opt/shaverma_adminka/backend/.env
+# Host/port are hardcoded here, NOT sourced from APP_HOST/APP_PORT in
+# .env via ${...} substitution -- app_host/app_port in Settings exist
+# only for local-dev instructions and aren't read anywhere else in the
+# app, so there's nothing to keep in sync by hardcoding them. This also
+# sidesteps a real, sharp-edged failure mode: ${VAR} substitution here
+# depends on systemd's OWN EnvironmentFile= parser successfully parsing
+# that exact line in .env -- which is *stricter* than the app's own
+# python-dotenv-based reader (pydantic-settings) and can silently
+# disagree with it on a line that's perfectly valid for the app itself
+# (e.g. `journalctl` showing "Invalid environment variable name
+# evaluates to an empty string: 127.0.0.1"). When that happens,
+# ${APP_HOST} evaluates to empty, so `--host` silently swallows `--port`
+# as its own value and uvicorn's CLI rejects the leftover port number as
+# an unexpected extra argument -- exit code 2, no indication at all that
+# the actual problem is upstream in how systemd parsed .env. Edit the
+# two literals below directly if this deployment needs a non-default
+# host/port.
+ExecStart=/opt/shaverma_adminka/backend/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8100
+Restart=on-failure
+RestartSec=5
+
+# Baseline hardening -- tighten further to taste.
+NoNewPrivileges=false
+# ^ sudo (for service.start/service.stop) needs to be able to elevate;
+# NoNewPrivileges=true would silently break that. Everything else below
+# still applies.
+ProtectSystem=strict
+# ^ Mounts the ENTIRE filesystem read-only for this unit's own process
+# tree -- and that includes every privileged helper invoked via sudo
+# from inside it: sudo changes uid/gid, not the mount namespace, so
+# root-via-sudo still inherits this unit's read-only view. Without the
+# ReadWritePaths= below, every write this app (or a helper it sudos
+# into) needs to make -- the .env editor, and every step of the
+# new-service wizard -- fails with a permission error, even though each
+# one is individually correctly privileged at the application layer.
+# Keep the first four in sync with INSTANCES_ROOT_DIR,
+# INSTANCE_STAGING_DIR, NGINX_CONFIG_PATH's directory, and
+# systemd_unit_helper.py's UNIT_DIR (see the README's sudoers section)
+# if any of them differ from the defaults below. The last two aren't app
+# paths at all -- they're other tools' own runtime state under /run,
+# needed regardless of what this app itself writes:
+#   /run/sudo    -- sudo's per-user auth timestamp cache
+#                   (/run/sudo/ts/<uid>), written on *every* sudo call
+#                   regardless of NOPASSWD. Missing this: sudo fails
+#                   before it even evaluates the sudoers rule ("unable to
+#                   open /run/sudo/ts/<uid>: Read-only file system"),
+#                   then falls through to demanding an interactive
+#                   password -- every sudo-elevated action in this app
+#                   fails this way, not just one of them.
+#   /run/nginx.pid -- `nginx -t` (the nginx.test action) opens this as
+#                   part of validating the config, even just to test it,
+#                   not only when actually starting nginx. Missing this:
+#                   "nginx -t rejected the new config (rolled back):
+#                   ... open() \"/run/nginx.pid\" failed (30: Read-only
+#                   file system)" -- every nginx config write in the
+#                   wizard fails (safely rolled back, but fails).
+#   /var/log/nginx -- `nginx -t` also opens every error_log/access_log
+#                   path referenced anywhere in nginx.conf (not just this
+#                   app's own generated blocks -- the *entire* config,
+#                   including whatever other sites are already on this
+#                   nginx instance), while testing, same as the pid file
+#                   above. The whole directory, not just the two default
+#                   log files, since any other site's config on this
+#                   nginx instance can point log directives elsewhere
+#                   under it and `nginx -t` validates the full config,
+#                   not just this app's own generated block.
+# If your nginx.conf sets a non-default `pid`/log directive pointing
+# outside these, use that path instead. More /run/* or similar paths
+# belonging to other tools invoked via sudo may surface the same way as
+# new actions are added -- same fix each time: add the specific path
+# here.
+ReadWritePaths=/opt/shaverma-instances /var/lib/shaverma_adminka/staging /etc/nginx/sites-available /etc/systemd/system /run/sudo /run/nginx.pid /var/log/nginx
+ProtectHome=read-only
+# ^ Not "true": the credential-provisioning script and npm install/build
+# are invoked directly (no sudo, no helper) as SERVICE_VENV_DIR/bin/python
+# and NODE_BIN_DIR/npm, both normally under /home -- "true" would hide
+# /home entirely and break both. "read-only" still blocks any write
+# under /home/ (the meaningful part of this hardening) while allowing
+# the reads this process actually needs. For tighter isolation, replace
+# with `ProtectHome=true` plus explicit
+# `BindReadOnlyPaths=/home/user1/common_venv /home/shaverma-admin/.nvm`
+# (or wherever SERVICE_VENV_DIR/NODE_BIN_DIR actually point).
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

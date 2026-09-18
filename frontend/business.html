@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>Shaverma Admin — Бизнес</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="app-body business-body">
+  <a class="skip-link" href="#main-content">Перейти к содержимому</a>
+  <div class="app-shell">
+    <button class="sidebar-backdrop" id="sidebar-backdrop" type="button" aria-label="Закрыть меню"></button>
+    <aside class="sidebar" id="app-sidebar" aria-label="Основная навигация">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">S</span><span class="brand-copy"><strong>Shaverma</strong><span>Control center</span></span></div>
+      <nav class="sidebar-nav">
+        <p class="nav-label">Управление</p>
+        <a class="nav-item" href="index.html"><span data-icon="dashboard"></span><span class="nav-text">Обзор</span></a>
+        <a class="nav-item active" href="business.html" aria-current="page"><span data-icon="chart"></span><span class="nav-text">Бизнес</span></a>
+        <a class="nav-item" href="index.html#services-section"><span data-icon="store"></span><span class="nav-text">Заведения</span></a>
+        <a class="nav-item" href="new-service.html"><span data-icon="plus"></span><span class="nav-text">Новое заведение</span></a>
+        <p class="nav-label nav-label-secondary">Система</p>
+        <span class="nav-item disabled" aria-disabled="true" title="Появится с endpoint для чтения аудита"><span data-icon="terminal"></span><span class="nav-text">Журнал действий</span><span class="nav-soon">Скоро</span></span>
+      </nav>
+      <div class="sidebar-footer"><div class="environment-row"><span class="environment-dot" aria-hidden="true"></span><span class="nav-text">Локальный mock</span></div><div class="account-row"><span class="avatar" aria-hidden="true">A</span><span class="account-copy nav-text"><strong id="current-username">…</strong><span>Администратор</span></span><button class="icon-button" id="logout-button" type="button" aria-label="Выйти"><span data-icon="logOut"></span></button></div></div>
+    </aside>
+
+    <main class="app-main business-main" id="main-content">
+      <header class="page-header business-header">
+        <div class="page-heading-row"><button class="icon-button mobile-menu-button" id="mobile-menu-button" type="button" aria-label="Открыть меню" aria-controls="app-sidebar" aria-expanded="false"><span data-icon="menu"></span></button><div class="page-heading"><p class="eyebrow">Клиентский мониторинг</p><h1>Эффективность точек клиентов</h1><p>Сравнивайте оборот, поток заказов и доставки по заведениям клиентов. Это техническая аналитика, а не выручка Shaverma.</p></div></div>
+        <span class="demo-badge"><span></span>Локальный mock · данные клиентов</span>
+      </header>
+
+      <section class="business-filters panel" aria-label="Фильтры бизнес-показателей">
+        <div class="period-switch" role="group" aria-label="Период">
+          <button class="is-active" type="button" data-period="today">Сегодня</button>
+          <button type="button" data-period="week">Неделя</button>
+          <button type="button" data-period="month">Месяц</button>
+        </div>
+        <label class="select-field business-store-filter"><span class="sr-only">Клиентская точка</span><select id="business-store"><option value="all">Все клиентские точки</option></select><span data-icon="chevronDown"></span></label>
+      </section>
+
+      <section class="business-kpis" aria-label="Главные показатели">
+        <article class="business-kpi orders"><span class="business-kpi-icon" data-icon="activity"></span><p>Заказов</p><strong id="metric-orders">—</strong><small id="metric-orders-note">За выбранный период</small></article>
+        <article class="business-kpi turnover"><span class="business-kpi-icon" data-icon="chart"></span><p>Оборот клиентов</p><strong id="metric-turnover">—</strong><small id="metric-turnover-note">Не является нашей выручкой</small></article>
+        <article class="business-kpi active"><span class="business-kpi-icon" data-icon="power"></span><p>Активных</p><strong id="metric-active-orders">—</strong><small>Заказов в работе сейчас</small></article>
+        <article class="business-kpi average"><span class="business-kpi-icon" data-icon="store"></span><p>Средний чек точки</p><strong id="metric-average-check">—</strong><small>По заказам за период</small></article>
+      </section>
+
+      <section class="business-grid-top">
+        <article class="panel business-chart-panel"><div class="business-panel-heading"><div><p class="eyebrow">Динамика</p><h2>Оборот клиентских точек</h2></div><strong id="turnover-total">—</strong></div><div class="turnover-bars" id="turnover-bars" aria-label="Динамика оборота клиентских точек"></div><div class="business-chart-foot"><span>Начало периода</span><span>Текущий момент</span></div></article>
+        <article class="panel order-flow-panel"><div class="business-panel-heading"><div><p class="eyebrow">В работе</p><h2>Поток заказов</h2></div><span class="count-chip" id="active-flow-count">—</span></div><div class="order-flow-list" id="order-flow-list"></div></article>
+      </section>
+
+      <section class="business-grid-bottom">
+        <article class="panel business-stores-panel"><div class="business-panel-heading"><div><p class="eyebrow">Рейтинг точек</p><h2>Сравнение клиентских заведений</h2></div><span class="panel-meta" id="stores-open-copy">—</span></div><p class="business-panel-description">Ранжирование по обороту за выбранный период. Данные принадлежат клиентам и используются только для технического мониторинга.</p><div class="business-store-list" id="business-store-list"></div></article>
+        <div class="business-side-stack">
+          <article class="panel business-delivery-panel"><div class="business-panel-heading"><div><p class="eyebrow">Канал заказов</p><h2>Доставки клиентов</h2></div><span class="panel-meta" id="delivery-stores-copy">—</span></div><div class="delivery-summary"><div><strong id="delivery-orders">—</strong><span>заказов с доставкой</span></div><div><strong id="delivery-turnover">—</strong><span>оборот доставки</span></div></div><div class="delivery-store-list" id="delivery-store-list"></div></article>
+          <article class="panel business-attention-panel"><p class="eyebrow">Операционный фокус</p><h2>Требуют внимания</h2><div class="attention-stat"><strong id="attention-tasks">—</strong><span>активных задач у кухни и персонала</span></div><div class="attention-stat muted"><strong id="attention-cancelled">—</strong><span>отменённых заказов за период</span></div><p class="business-note">Локальный прототип: текущий backend пока не содержит analytics API. При подключении будут отображаться только данные, которые он реально отдаёт.</p></article>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="js/local-demo.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/business-demo.js"></script>
+  <script src="js/business.js"></script>
+</body>
+</html>

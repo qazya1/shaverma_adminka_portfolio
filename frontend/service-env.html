@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shaverma Admin — .env</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="dashboard">
+    <header class="topbar">
+      <div>
+        <a class="back-link" href="index.html">&larr; Сервисы</a>
+        <h1 id="page-title">.env</h1>
+        <p class="hint" id="path-hint"></p>
+      </div>
+      <div class="topbar-right">
+        <span>Вы вошли как <span class="username" id="current-username">…</span></span>
+        <button id="logout-button" class="secondary">Выйти</button>
+      </div>
+    </header>
+
+    <div id="app-error" class="error"></div>
+    <p id="loading" class="hint">Загрузка…</p>
+
+    <section class="panel hidden" id="env-panel">
+      <div class="panel-header">
+        <h2>Переменные окружения</h2>
+        <label class="reveal-toggle">
+          <input type="checkbox" id="reveal-all" />
+          Показать значения
+        </label>
+      </div>
+
+      <table class="services-table" id="env-table">
+        <thead>
+          <tr>
+            <th>Поле</th>
+            <th>Значение</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="env-body"></tbody>
+      </table>
+
+      <div class="env-toolbar">
+        <button type="button" id="add-field-button" class="secondary">+ Добавить поле</button>
+        <button type="button" id="save-button">Сохранить</button>
+      </div>
+    </section>
+
+    <section class="panel hidden" id="update-panel">
+      <div class="panel-header">
+        <h2>Обновление файлов сервиса</h2>
+      </div>
+      <p class="hint">
+        Загрузите zip с папкой <code>backend/</code>, папкой <code>frontend/</code> (несобранный
+        исходный код — будет собран заново) или обеими сразу. Что есть в архиве, то и заменится
+        на сервере; остальное (.env, nginx, systemd) не трогается. При обновлении backend служба
+        будет перезапущена автоматически.
+      </p>
+      <div class="upload-controls">
+        <input type="file" id="update-file" accept=".zip" />
+        <button type="button" id="update-button" class="button secondary">Обновить</button>
+      </div>
+      <p class="hint" id="update-result"></p>
+    </section>
+
+    <section class="panel hidden" id="seed-panel">
+      <div class="panel-header">
+        <h2>Заполнение БД (seed)</h2>
+      </div>
+      <p class="hint" id="seed-empty-hint">
+        В <code>backend/app/seed/</code> не найдено ни одной пары скриптов
+        (<code>seed_data*.py</code> + <code>seed_db*.py</code>).
+      </p>
+      <div id="seed-controls" class="hidden">
+        <p class="hint">
+          Отредактируйте данные ниже (raw-текст файла <code>seed_data</code>), сохраните, затем
+          запустите заполнение. Скрипт сам решает, безопасно ли запускать его повторно —
+          повторный запуск может задублировать данные, если скрипт этого не предусматривает.
+        </p>
+        <div class="upload-controls seed-pair-row">
+          <label for="seed-pair-select">Пара скриптов:</label>
+          <select id="seed-pair-select"></select>
+        </div>
+        <textarea id="seed-data-editor" class="seed-data-editor" spellcheck="false"></textarea>
+        <div class="env-toolbar">
+          <button type="button" id="seed-save-button" class="secondary">Сохранить данные</button>
+          <button type="button" id="seed-run-button">Запустить заполнение</button>
+        </div>
+        <p class="hint" id="seed-save-status"></p>
+        <pre class="seed-run-output hidden" id="seed-run-output"></pre>
+      </div>
+    </section>
+  </div>
+
+  <script src="js/local-demo.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/service-env.js"></script>
+</body>
+</html>

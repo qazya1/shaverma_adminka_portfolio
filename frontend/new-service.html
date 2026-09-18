@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>Shaverma Admin — новый сервис</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="provision-body">
+  <main class="provision-shell">
+    <header class="provision-header">
+      <div>
+        <a class="back-link provision-back" href="index.html"><span data-icon="arrowRight" data-icon-class="icon icon-small"></span>К заведениям</a>
+        <p class="eyebrow">Shaverma Control Center</p>
+        <h1>Новое заведение</h1>
+      </div>
+      <div class="provision-account"><span>Администратор <strong id="current-username">…</strong></span><button id="logout-button" class="button secondary" type="button">Выйти</button></div>
+    </header>
+
+    <div id="app-error" class="provision-error hidden" role="alert"></div>
+
+    <section class="provision-intro" id="wizard-intro">
+      <p>Настройте данные сервиса, а после создания проведите его через реальные этапы подготовки инфраструктуры.</p>
+      <ol class="wizard-progress" aria-label="Этапы создания сервиса">
+        <li class="active" data-progress-step="1"><span>01</span><strong>Основные данные</strong></li>
+        <li data-progress-step="2"><span>02</span><strong>Каналы</strong></li>
+        <li data-progress-step="3"><span>03</span><strong>Настройки</strong></li>
+        <li data-progress-step="4"><span>04</span><strong>Создание</strong></li>
+      </ol>
+    </section>
+
+    <div class="provision-layout">
+      <section class="provision-workspace" aria-live="polite">
+        <form id="create-form" novalidate>
+          <section class="wizard-screen active" data-wizard-step="1">
+            <div class="wizard-screen-heading"><p class="eyebrow">Шаг 01</p><h2>Основные данные</h2><p>Это имя увидят администраторы, а системное имя станет идентификатором инфраструктуры.</p></div>
+            <div class="wizard-fields">
+              <div class="field-group"><label for="f-name">Название заведения</label><p>Понятное название для списка заведений.</p><input type="text" id="f-name" required autocomplete="organization" placeholder="Например, Шаверма на Петроградке" /></div>
+              <div class="field-group"><label for="f-label">Домен</label><p>Только поддомен — без <code>https://</code> и зоны.</p><input type="text" id="f-label" required autocapitalize="off" autocomplete="off" placeholder="petrogradka" /><span class="field-helper" id="url-preview">Адрес появится здесь</span></div>
+              <div class="field-group"><label for="f-system-name">Системное имя</label><p>Используется в директориях, systemd-юнитах и конфигурации.</p><input class="technical-input" type="text" id="f-system-name" required autocapitalize="off" autocomplete="off" placeholder="petrogradka" /></div>
+            </div>
+            <label class="toggle-row"><span><strong>Сервис активен</strong><small>После запуска его можно будет включать и останавливать из панели.</small></span><input type="checkbox" id="f-is-active" checked /><span class="toggle-control" aria-hidden="true"></span></label>
+            <div class="wizard-actions"><span class="wizard-step-caption">1 из 4</span><button class="button primary wizard-next" type="button" data-step-target="2">Продолжить <span data-icon="arrowRight" data-icon-class="icon icon-small"></span></button></div>
+          </section>
+
+          <section class="wizard-screen" data-wizard-step="2" hidden>
+            <div class="wizard-screen-heading"><p class="eyebrow">Шаг 02</p><h2>Каналы</h2><p>Выберите каналы, которые должны быть доступны для нового заведения.</p></div>
+            <div class="toggle-stack">
+              <label class="toggle-row channel-toggle"><span><strong>Telegram</strong><small>Подключить канал Telegram к создаваемому сервису.</small></span><input type="checkbox" id="f-channel-telegram" checked /><span class="toggle-control" aria-hidden="true"></span></label>
+              <label class="toggle-row channel-toggle"><span><strong>MAX</strong><small>Подключить канал MAX к создаваемому сервису.</small></span><input type="checkbox" id="f-channel-max" checked /><span class="toggle-control" aria-hidden="true"></span></label>
+            </div>
+            <div class="wizard-actions split-actions"><button class="button ghost wizard-back" type="button" data-step-target="1">Назад</button><button class="button primary wizard-next" type="button" data-step-target="3">Продолжить <span data-icon="arrowRight" data-icon-class="icon icon-small"></span></button></div>
+          </section>
+
+          <section class="wizard-screen" data-wizard-step="3" hidden>
+            <div class="wizard-screen-heading"><p class="eyebrow">Шаг 03</p><h2>Дополнительные настройки</h2><p>Их можно не заполнять, если ключи для интеграции сейчас не нужны.</p></div>
+            <details class="advanced-settings" id="advanced-settings"><summary><span><strong>Дополнительные настройки</strong><small>Ключи входа для интеграций</small></span><span data-icon="chevronDown" data-icon-class="icon"></span></summary><div class="advanced-settings-content wizard-fields"><div class="field-group"><label for="f-bot-entry-key">bot_entry_key</label><p>Необязательный ключ для bot entry.</p><input class="technical-input" type="text" id="f-bot-entry-key" autocomplete="off" /></div><div class="field-group"><label for="f-client-bot-entry-key">client_bot_entry_key</label><p>Необязательный ключ для client bot entry.</p><input class="technical-input" type="text" id="f-client-bot-entry-key" autocomplete="off" /></div></div></details>
+            <div class="wizard-actions split-actions"><button class="button ghost wizard-back" type="button" data-step-target="2">Назад</button><button class="button primary wizard-next" type="button" data-step-target="4">Продолжить <span data-icon="arrowRight" data-icon-class="icon icon-small"></span></button></div>
+          </section>
+
+          <section class="wizard-screen" data-wizard-step="4" hidden>
+            <div class="wizard-screen-heading"><p class="eyebrow">Шаг 04</p><h2>Проверка и создание</h2><p>Проверьте данные. После этого появится запись сервиса и откроется реальный процесс подготовки.</p></div>
+            <div class="creation-summary" id="creation-summary"><div><span>Название</span><strong id="summary-name">—</strong></div><div><span>Домен</span><strong id="summary-domain">—</strong></div><div><span>system_name</span><code id="summary-system-name">—</code></div><div><span>Каналы</span><strong id="summary-channels">—</strong></div><div><span>Статус</span><strong id="summary-active">Активен</strong></div></div>
+            <div class="wizard-actions split-actions"><button class="button ghost wizard-back" type="button" data-step-target="3">Назад</button><button class="button primary create-service-button" type="submit" id="create-button"><span data-icon="plus" data-icon-class="icon icon-small"></span>Создать сервис</button></div>
+          </section>
+        </form>
+
+        <section class="provisioning-stage hidden" id="step-wizard">
+          <div class="wizard-screen-heading"><p class="eyebrow">Сервис создан</p><h2>Подготовка инфраструктуры</h2><p>Каждый шаг запускает существующую операцию backend и обновляет статус по факту.</p></div>
+          <div class="provision-service-line"><span class="service-avatar" id="provision-avatar">S</span><div><strong id="provision-name">Новый сервис</strong><code id="provision-system-name">—</code></div><span class="status-chip success"><span class="status-dot" aria-hidden="true"></span>Запись создана</span></div>
+          <div class="provision-timeline" id="provision-timeline">
+            <article class="provision-item done" data-provision-key="record"><span class="provision-marker" data-provision-marker="record" data-icon="check"></span><div><strong>Запись создана</strong><small>Сервис зарегистрирован в панели.</small></div></article>
+            <article class="provision-item" id="step-dirs" data-provision-key="dirs"><span class="provision-marker" data-provision-marker="dirs">01</span><div><strong>Директории подготовлены</strong><small>Создаёт рабочую структуру нового сервиса.</small><button type="button" id="dirs-button" class="button secondary">Подготовить директории</button></div></article>
+            <article class="provision-item" id="step-upload" data-provision-key="backend_uploaded"><span class="provision-marker" data-provision-marker="backend_uploaded">02</span><div><strong>Backend</strong><small>Загрузите zip с папками <code>frontend/</code> и <code>backend/</code>.</small><div class="upload-controls"><input type="file" id="upload-file" accept=".zip" /><button type="button" id="upload-button" class="button secondary">Загрузить код</button></div></div></article>
+            <article class="provision-item" id="step-env" data-provision-key="env_generated"><span class="provision-marker" data-provision-marker="env_generated">03</span><div><strong>Environment</strong><small>Генерирует <code>.env</code>, базу данных и системные секреты.</small><details class="provision-config" open><summary>Параметры окружения <span data-icon="chevronDown" data-icon-class="icon icon-small"></span></summary><div class="provision-config-content"><div class="wizard-fields compact-fields"><div class="field-group"><label for="f-database-name">Имя базы данных MySQL</label><input class="technical-input" type="text" id="f-database-name" placeholder="system_name" /></div><div class="field-group"><label for="f-database-user">Пользователь БД</label><input class="technical-input" type="text" id="f-database-user" placeholder="system_name" /></div></div><label class="toggle-row compact-toggle"><span><strong>YooKassa: рекуррентные платежи</strong><small>Включите, если эта интеграция нужна сразу.</small></span><input type="checkbox" id="f-yookassa-recurring" /><span class="toggle-control" aria-hidden="true"></span></label><div class="wizard-fields compact-fields"><div class="field-group"><label for="f-yookassa-shop-id">YooKassa shop_id</label><input type="text" id="f-yookassa-shop-id" autocomplete="off" /></div><div class="field-group"><label for="f-yookassa-secret-key">YooKassa secret_key</label><input type="password" id="f-yookassa-secret-key" autocomplete="off" /></div></div><label class="toggle-row compact-toggle"><span><strong>Локальный Telegram Web SDK</strong><small>Копировать telegram-web-app.js в public/ перед каждой сборкой frontend.</small></span><input type="checkbox" id="f-telegram-web-app-local-sdk" checked /><span class="toggle-control" aria-hidden="true"></span></label></div></details><button type="button" id="env-button" class="button secondary">Сгенерировать .env</button><p class="step-hint" id="env-hint"></p></div></article>
+            <article class="provision-item" id="step-frontend" data-provision-key="frontend_built"><span class="provision-marker" data-provision-marker="frontend_built">04</span><div><strong>Frontend</strong><small>Собирает и устанавливает интерфейс сервиса.</small><button type="button" id="frontend-button" class="button secondary">Собрать frontend</button></div></article>
+            <article class="provision-item" id="step-nginx" data-provision-key="nginx"><span class="provision-marker" data-provision-marker="nginx">05</span><div><strong>Nginx</strong><small>Создаёт и проверяет конфигурацию домена.</small><button type="button" id="nginx-button" class="button secondary">Настроить nginx</button><p class="step-hint" id="nginx-hint"></p></div></article>
+            <article class="provision-item" id="step-systemd" data-provision-key="systemd"><span class="provision-marker" data-provision-marker="systemd">06</span><div><strong>Systemd</strong><small>Создаёт backend-юнит и запускает сервис.</small><div class="inline-control"><input class="technical-input" type="number" id="f-port" placeholder="Порт" inputmode="numeric" /><button type="button" id="systemd-button" class="button primary">Запустить сервис</button></div></div></article>
+          </div>
+          <button type="button" id="refresh-status-button" class="button ghost refresh-provisioning"><span data-icon="refresh" data-icon-class="icon icon-small"></span>Обновить статус</button>
+        </section>
+
+        <section class="provision-success hidden" id="success-stage"><span class="success-icon" data-icon="check"></span><p class="eyebrow">Готово</p><h2>Сервис готов</h2><p>Все реальные этапы provisioning завершены. Сервис можно открыть или найти в общем списке.</p><div class="success-summary"><strong id="success-name">Новый сервис</strong><code id="success-domain">—</code></div><div class="success-actions"><a id="success-service-link" class="button primary" href="#" target="_blank" rel="noopener">Открыть сервис</a><a class="button secondary" href="index.html#services-section">Перейти к заведению</a><a class="button ghost" href="new-service.html">Создать ещё один</a></div>
+          <div class="seed-embed" id="seed-panel">
+            <div class="wizard-screen-heading"><p class="eyebrow">Опционально</p><h2>Заполнение БД (seed)</h2></div>
+            <p class="hint" id="seed-empty-hint">
+              В <code>backend/app/seed/</code> не найдено ни одной пары скриптов
+              (<code>seed_data*.py</code> + <code>seed_db*.py</code>) -- можно пропустить этот шаг.
+            </p>
+            <div id="seed-controls" class="hidden">
+              <p class="hint">
+                Отредактируйте данные ниже (raw-текст файла <code>seed_data</code>), сохраните, затем
+                запустите заполнение. Скрипт сам решает, безопасно ли запускать его повторно.
+              </p>
+              <div class="upload-controls seed-pair-row">
+                <label for="seed-pair-select">Пара скриптов:</label>
+                <select id="seed-pair-select"></select>
+              </div>
+              <textarea id="seed-data-editor" class="seed-data-editor" spellcheck="false"></textarea>
+              <div class="env-toolbar">
+                <button type="button" id="seed-save-button" class="button secondary">Сохранить данные</button>
+                <button type="button" id="seed-run-button" class="button primary">Запустить заполнение</button>
+              </div>
+              <p class="hint" id="seed-save-status"></p>
+              <pre class="seed-run-output hidden" id="seed-run-output"></pre>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <aside class="service-preview"><details id="preview-details" open><summary><span>Предпросмотр сервиса</span><span data-icon="chevronDown" data-icon-class="icon"></span></summary><div class="service-preview-content"><p class="eyebrow">Будущее заведение</p><div class="preview-identity"><span class="service-avatar" id="preview-avatar">S</span><div><strong id="preview-name">Название заведения</strong><span id="preview-active">Активен после запуска</span></div></div><dl class="preview-list"><div><dt>Домен</dt><dd id="preview-domain">Появится после ввода</dd></div><div><dt>system_name</dt><dd><code id="preview-system-name">—</code></dd></div><div><dt>Telegram</dt><dd id="preview-telegram">Подключён</dd></div><div><dt>MAX</dt><dd id="preview-max">Подключён</dd></div></dl><p class="preview-note">Сначала создаётся запись сервиса, затем вы запускаете реальные этапы подготовки инфраструктуры.</p></div></details></aside>
+    </div>
+  </main>
+
+  <script src="js/local-demo.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/new-service.js"></script>
+</body>
+</html>

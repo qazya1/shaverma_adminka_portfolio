@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>Shaverma Admin — Обзор</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="app-body">
+  <a class="skip-link" href="#main-content">Перейти к содержимому</a>
+
+  <div class="app-shell">
+    <button class="sidebar-backdrop" id="sidebar-backdrop" type="button" aria-label="Закрыть меню"></button>
+
+    <aside class="sidebar" id="app-sidebar" aria-label="Основная навигация">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">S</span>
+        <span class="brand-copy">
+          <strong>Shaverma</strong>
+          <span>Control center</span>
+        </span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <p class="nav-label">Управление</p>
+        <a class="nav-item active" href="index.html" aria-current="page">
+          <span data-icon="dashboard"></span>
+          <span class="nav-text">Обзор</span>
+        </a>
+        <a class="nav-item" href="business.html">
+          <span data-icon="chart"></span>
+          <span class="nav-text">Бизнес</span>
+        </a>
+        <a class="nav-item" href="#services-section">
+          <span data-icon="store"></span>
+          <span class="nav-text">Заведения</span>
+        </a>
+        <a class="nav-item" href="new-service.html">
+          <span data-icon="plus"></span>
+          <span class="nav-text">Новое заведение</span>
+        </a>
+
+        <p class="nav-label nav-label-secondary">Система</p>
+        <span class="nav-item disabled" aria-disabled="true" title="Backend хранит аудит, но пока не предоставляет endpoint для чтения">
+          <span data-icon="terminal"></span>
+          <span class="nav-text">Журнал действий</span>
+          <span class="nav-soon">Скоро</span>
+        </span>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="environment-row">
+          <span class="environment-dot" aria-hidden="true"></span>
+          <span class="nav-text" id="environment-label">Рабочий контур</span>
+        </div>
+        <div class="account-row">
+          <span class="avatar" aria-hidden="true">A</span>
+          <span class="account-copy nav-text">
+            <strong id="current-username">…</strong>
+            <span>Администратор</span>
+          </span>
+          <button class="icon-button" id="logout-button" type="button" aria-label="Выйти">
+            <span data-icon="logOut"></span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="app-main" id="main-content">
+      <header class="page-header">
+        <div class="page-heading-row">
+          <button class="icon-button mobile-menu-button" id="mobile-menu-button" type="button" aria-label="Открыть меню" aria-controls="app-sidebar" aria-expanded="false">
+            <span data-icon="menu"></span>
+          </button>
+          <div class="page-heading">
+            <p class="eyebrow">Операционный центр</p>
+            <h1>Обзор заведений</h1>
+            <p>Состояние управляемых сервисов и быстрые инфраструктурные действия.</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="button secondary" id="refresh-button" type="button">
+            <span data-icon="refresh"></span>
+            Обновить
+          </button>
+          <button class="button secondary" id="check-all-button" type="button" title="Проверить статус systemd-служб всех сервисов">
+            <span data-icon="server"></span>
+            Проверить службы
+          </button>
+          <a class="button primary" href="new-service.html">
+            <span data-icon="plus"></span>
+            Новое заведение
+          </a>
+        </div>
+      </header>
+
+      <div class="alert error-alert hidden" id="app-error" role="alert">
+        <span class="alert-icon" data-icon="alert"></span>
+        <div>
+          <strong>Не удалось загрузить данные</strong>
+          <p id="app-error-message"></p>
+        </div>
+        <button class="button ghost compact" id="error-retry-button" type="button">Повторить</button>
+      </div>
+
+      <section class="metrics-grid" aria-label="Сводка по заведениям">
+        <article class="metric-card reveal-item">
+          <div class="metric-topline">
+            <span class="metric-icon" data-icon="store"></span>
+            <span class="metric-context">В управлении</span>
+          </div>
+          <strong class="metric-value skeleton-text" id="metric-total">—</strong>
+          <p>Всего сервисов с настроенным <code>system_name</code></p>
+        </article>
+        <article class="metric-card reveal-item">
+          <div class="metric-topline">
+            <span class="metric-icon success" data-icon="activity"></span>
+            <span class="metric-context">По данным БД</span>
+          </div>
+          <strong class="metric-value skeleton-text" id="metric-active">—</strong>
+          <p>Отмечены как активные</p>
+        </article>
+        <article class="metric-card reveal-item">
+          <div class="metric-topline">
+            <span class="metric-icon neutral" data-icon="power"></span>
+            <span class="metric-context">Остановлены</span>
+          </div>
+          <strong class="metric-value skeleton-text" id="metric-inactive">—</strong>
+          <p>Неактивны или остановлены</p>
+        </article>
+        <article class="metric-card reveal-item">
+          <div class="metric-topline">
+            <span class="metric-icon warning" data-icon="alert"></span>
+            <span class="metric-context">Требуют внимания</span>
+          </div>
+          <strong class="metric-value skeleton-text" id="metric-unchecked">—</strong>
+          <p>Live-статус ещё не проверен</p>
+        </article>
+      </section>
+
+      <section class="overview-grid">
+        <article class="panel distribution-panel reveal-item">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Распределение</p>
+              <h2>Операционное состояние</h2>
+            </div>
+            <span class="panel-meta" id="distribution-total">0 сервисов</span>
+          </div>
+          <div class="distribution-track" aria-hidden="true">
+            <span class="distribution-active" id="distribution-active-bar"></span>
+            <span class="distribution-inactive" id="distribution-inactive-bar"></span>
+          </div>
+          <div class="distribution-legend">
+            <div>
+              <span class="legend-dot active"></span>
+              <span>Активны</span>
+              <strong id="distribution-active-count">0</strong>
+            </div>
+            <div>
+              <span class="legend-dot inactive"></span>
+              <span>Остановлены</span>
+              <strong id="distribution-inactive-count">0</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel readiness-panel reveal-item">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Контур управления</p>
+              <h2>Готовность инфраструктуры</h2>
+            </div>
+            <span class="metric-icon" data-icon="server"></span>
+          </div>
+          <dl class="readiness-list">
+            <div>
+              <dt>Валидные systemd-юниты</dt>
+              <dd id="readiness-valid-units">—</dd>
+            </div>
+            <div>
+              <dt>Статус проверен в сессии</dt>
+              <dd id="readiness-checked">—</dd>
+            </div>
+            <div>
+              <dt>Некорректные идентификаторы</dt>
+              <dd id="readiness-invalid-units">—</dd>
+            </div>
+          </dl>
+        </article>
+      </section>
+
+      <section class="panel services-panel reveal-item" id="services-section">
+        <div class="section-toolbar">
+          <div>
+            <p class="eyebrow">Управляемые контуры</p>
+            <div class="section-title-line">
+              <h2>Заведения</h2>
+              <span class="count-chip" id="services-count">0</span>
+            </div>
+          </div>
+          <div class="table-filters" aria-label="Фильтры заведений">
+            <label class="search-field">
+              <span class="sr-only">Поиск заведений</span>
+              <span data-icon="search"></span>
+              <input id="service-search" type="search" placeholder="Название или system_name" autocomplete="off" />
+            </label>
+            <label class="select-field">
+              <span class="sr-only">Фильтр по статусу</span>
+              <select id="status-filter">
+                <option value="all">Все состояния</option>
+                <option value="active">Активные</option>
+                <option value="inactive">Остановленные</option>
+                <option value="unchecked">Не проверены</option>
+              </select>
+              <span data-icon="chevronDown"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="table-state" id="services-loading" aria-live="polite">
+          <div class="table-skeleton-row"></div>
+          <div class="table-skeleton-row"></div>
+          <div class="table-skeleton-row"></div>
+        </div>
+
+        <div class="empty-state hidden" id="services-empty">
+          <span class="empty-icon" data-icon="store"></span>
+          <h3>Заведений пока нет</h3>
+          <p id="services-empty-copy">Создайте первый сервис, чтобы начать управление.</p>
+          <a class="button secondary" href="new-service.html">Добавить заведение</a>
+        </div>
+
+        <div class="table-wrap hidden" id="services-table-wrap">
+          <table class="data-table" id="services-table">
+            <thead>
+              <tr>
+                <th scope="col">Заведение</th>
+                <th scope="col">Системное имя</th>
+                <th scope="col">Systemd-юнит</th>
+                <th scope="col">Состояние</th>
+                <th scope="col"><span class="sr-only">Действия</span></th>
+              </tr>
+            </thead>
+            <tbody id="services-body"></tbody>
+          </table>
+          <p class="table-scroll-hint" aria-hidden="true">Проведите влево, чтобы увидеть действия</p>
+        </div>
+        <div class="mobile-services-list hidden" id="mobile-services-list" aria-label="Список заведений"></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="app-dialog" id="action-dialog" aria-labelledby="dialog-title" aria-describedby="dialog-copy">
+    <form method="dialog">
+      <div class="dialog-icon" data-icon="power"></div>
+      <div class="dialog-content">
+        <p class="eyebrow">Подтверждение действия</p>
+        <h2 id="dialog-title">Остановить сервис?</h2>
+        <p id="dialog-copy">Сервис перестанет отвечать до следующего запуска.</p>
+      </div>
+      <div class="dialog-actions">
+        <button class="button secondary" type="submit" value="cancel">Отмена</button>
+        <button class="button danger" id="dialog-confirm-button" type="submit" value="confirm">Остановить</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="js/local-demo.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
